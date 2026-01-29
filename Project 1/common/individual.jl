@@ -1,5 +1,5 @@
 using Random
-
+Random.seed!(123)
 
 mutable struct Individual
     genes::BitVector

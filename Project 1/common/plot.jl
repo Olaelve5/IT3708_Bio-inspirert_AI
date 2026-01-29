@@ -3,7 +3,7 @@ using Plots
 """
 plot_fitness() is only used in the knapsack problem.
 """
-function plot_fitness(mean_scores, minimum_scores, maximum_scores; outfile="Project 1/knapsack/fitness_plot.pdf")
+function plot_fitness(mean_scores, minimum_scores, maximum_scores, best_score=nothing, best_generation=nothing; outfile="Project 1/knapsack/fitness_plot.pdf")
     plot(mean_scores,
          label="Mean Fitness",
          xlabel="Generation",
@@ -14,6 +14,20 @@ function plot_fitness(mean_scores, minimum_scores, maximum_scores; outfile="Proj
 
     plot!(maximum_scores, label="Max Fitness", color=:green)
     plot!(minimum_scores, label="Min Fitness", color=:red)
+
+    if best_score !== nothing && best_generation !== nothing
+        best_score_label = best_score isa Integer ? string(best_score) : string(round(best_score, digits=3))
+        vline!([best_generation],
+               label="Best $(best_score_label) - gen $(best_generation)",
+               linestyle=:dash,
+               color=:black,
+               lw=2)
+
+        scatter!([best_generation], [best_score],
+                 label=false,
+                 markershape=:star5,
+                 color=:black)
+    end
 
     savefig(outfile)
     return nothing
