@@ -4,8 +4,7 @@ include(joinpath(@__DIR__, "individual.jl"))
 const fitness_memory = Dict{BitVector, Float64}()
 
 """
-This function is only used in the feature selection problem.
-Knapsack has its own fitness function defined in knapsack.jl
+Calculates the fitness score for a given set of genes.
 """
 function fitness_score(genes::BitVector)
     # Only give a penalty if it doesn't take any features

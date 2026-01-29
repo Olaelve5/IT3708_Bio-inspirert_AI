@@ -1,5 +1,5 @@
 """
-Crossover function that combines two parent BitVectors to produce offspring
+Crossover function that combines two parent BitVectors to produce children
 based on a crossover probability.
 """
 function crossover(parent1_vec::BitVector, parent2_vec::BitVector)

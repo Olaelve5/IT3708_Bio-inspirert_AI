@@ -1,8 +1,16 @@
-include(joinpath(@__DIR__, "../common/individual.jl"))
+include(joinpath(@__DIR__, "individual.jl"))
 
-
+"""
+Calculates the Hamming distance between two BitVectors.
+"""
 hamming_distance(genes1::BitVector, genes2::BitVector) = count(xor.(genes1, genes2))
 
+
+"""
+Implements deterministic crowding survivor selection. The parents and children
+are paired based on minimum Hamming distance, and the fitter individual from
+each pair is selected to survive.
+"""
 function deterministic_crowding(parents::Vector{Individual}, children::Vector{Individual})
     # There are only two ways to pair parents and children
     dist_A = hamming_distance(parents[1].genes, children[1].genes) + 
@@ -23,7 +31,11 @@ function deterministic_crowding(parents::Vector{Individual}, children::Vector{In
 end
 
 
-
+"""
+Implements probabilistic crowding survivor selection. The parents and children
+are paired based on minimum Hamming distance, and the survivor from each pair
+is chosen probabilistically based on fitness.
+"""
 function probabilistic_crowding(parents::Vector{Individual}, children::Vector{Individual})
     dist_A = hamming_distance(parents[1].genes, children[1].genes) + 
              hamming_distance(parents[2].genes, children[2].genes)
@@ -42,7 +54,9 @@ function probabilistic_crowding(parents::Vector{Individual}, children::Vector{In
     return s1, s2
 end
 
-
+"""
+Helper function for probabilistic crowding to select a winner between a parent
+"""
 function probabilistic_winner(parent::Individual, child::Individual; scaling_factor=50.0)
     # Apply power scaling to make differences larger
     f_parent_scaled = parent.fitness ^ scaling_factor

@@ -3,17 +3,26 @@ using DataFrames
 using StableRNGs
 using MLJ
 
-include(joinpath(@__DIR__, "./helpers/LinReg.jl"))
-include(joinpath(@__DIR__, "./helpers/entropy.jl"))
-include(joinpath(@__DIR__, "./helpers/crowding.jl"))
-include(joinpath(@__DIR__, "./helpers/plot.jl"))
-include(joinpath(@__DIR__, "./helpers/individual.jl"))
-include(joinpath(@__DIR__, "./helpers/fitness.jl"))
-include(joinpath(@__DIR__, "./helpers/survivor_selection.jl"))
-include(joinpath(@__DIR__, "./helpers/mutate.jl"))
-include(joinpath(@__DIR__, "./helpers/crossover.jl"))
+# ============================================================================
+# Include helper files - this imports all files in helpers/
+# ============================================================================
+include(joinpath(@__DIR__, "helpers", "all.jl"))
 
 
+# ============================================================================
+# GA Hyperparameters
+# I guess genes_size isn't really a hyperparameter, but it is defined here for convenience
+# ============================================================================
+const POPULATION_SIZE::Int64 = 100
+const GENES_SIZE::Int64 = 101
+const CROSSOVER_PROB::Float64 = 0.8
+const MUTATION_RATE::Float64 = 0.01
+const MAX_GENERATIONS::Int64 = 100
+const TOURNAMENT_GROUP_SIZE = 3
+
+# ============================================================================
+# Load dataset and create model + print baseline RMSE
+# ============================================================================
 function make_regression()
     file_path = joinpath(@__DIR__, "resources/dataset.txt")
     data = CSV.read(file_path, DataFrame, header=0)
@@ -33,58 +42,10 @@ baseline_rmse = get_fitness(model, X, y; rng=myRNG)
 
 println("Baseline RMSE (All Features): $(round(baseline_rmse, digits=4))")
 
-"""
-parent_selection() uses tournament selection as FPS with roulette wheel selection
-did not perform well.
-"""
-function parent_selection(population::Vector{Individual})
-    group_size = TOURNAMENT_GROUP_SIZE
-    parent_pool::Vector{Individual} = []
 
-    for _ in 1:POPULATION_SIZE
-        group_indices = rand(1:POPULATION_SIZE, group_size)
-        winner_index = argmax(i -> population[i].fitness, group_indices)
-
-        push!(parent_pool, population[winner_index])
-    end
-
-    return parent_pool
-end
-
-
-function generate_next_gen(population::Vector{Individual}, crowding_mode::Symbol=:none)
-    new_pop = Vector{Individual}()
-
-    for i in 1:2:length(population)
-        parent1 = population[i]
-        parent2 = population[i+1]
-
-        child_genes = crossover(parent1.genes, parent2.genes)
-
-        mutate!(child_genes[1])
-        mutate!(child_genes[2])
-
-        child1 = Individual(child_genes[1])
-        child2 = Individual(child_genes[2])
-
-        child1.fitness = fitness_score(child_genes[1])
-        child2.fitness = fitness_score(child_genes[2])
-
-        if crowding_mode == :probabilistic_crowding
-            survivor1, survivor2 = probabilistic_crowding([parent1, parent2], [child1, child2])
-        elseif crowding_mode == :deterministic_crowding
-            survivor1, survivor2 = deterministic_crowding([parent1, parent2], [child1, child2])
-        else
-            survivor1 = child1
-            survivor2 = child2
-        end
-
-        append!(new_pop, (survivor1, survivor2))
-    end
-
-    return new_pop
-end
-
+# ============================================================================
+# Run Genetic Algorithm
+# ============================================================================
 function run_experiment(mode::Symbol)
     mean_scores = Float64[]
     max_scores = Float64[]
@@ -174,16 +135,5 @@ function main()
     )
 end
 
-# Simulation Parameters
-const POPULATION_SIZE::Int64 = 100
-const GENES_SIZE::Int64 = 101
-const CROSSOVER_PROB::Float64 = 0.8
-const MUTATION_RATE::Float64 = 0.01
-const MAX_GENERATIONS::Int64 = 100
-const TOURNAMENT_GROUP_SIZE = 3
-
-
-# Prevents the main script from running when being imported in another file
-if abspath(PROGRAM_FILE) == @__FILE__
-    main()
-end
+# Run the genetic algorithm
+main()
