@@ -6,7 +6,7 @@ using MLJ
 include(joinpath(@__DIR__, "LinReg.jl"))
 include(joinpath(@__DIR__, "entropy.jl"))
 include(joinpath(@__DIR__, "crowding.jl"))
-include(joinpath(@__DIR__, "plot.jl"))
+include(joinpath(@__DIR__, "../common/plot.jl"))
 include(joinpath(@__DIR__, "../common/individual.jl"))
 include(joinpath(@__DIR__, "../common/fitness.jl"))
 include(joinpath(@__DIR__, "../common/survivor.jl"))

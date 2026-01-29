@@ -1,5 +1,27 @@
 using Plots
 
+"""
+plot_fitness() is only used in the knapsack problem.
+"""
+function plot_fitness(mean_scores, minimum_scores, maximum_scores; outfile="Project 1/knapsack/fitness_plot.pdf")
+    plot(mean_scores,
+         label="Mean Fitness",
+         xlabel="Generation",
+         ylabel="Fitness Score",
+         title="Genetic Algorithm Performance",
+         lw=2,
+         size=(800, 600))
+
+    plot!(maximum_scores, label="Max Fitness", color=:green)
+    plot!(minimum_scores, label="Min Fitness", color=:red)
+
+    savefig(outfile)
+    return nothing
+end
+
+"""
+plot_rmse() is only used in the feature selection problem.
+"""
 function plot_rmse(mean_scores, minimum_scores, maximum_scores; outfile="Project 1/feature_selection/plots/fitness_plot.pdf")
     plot(mean_scores,
          label="Mean RMSE",

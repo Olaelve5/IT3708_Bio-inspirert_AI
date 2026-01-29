@@ -8,6 +8,7 @@ include(joinpath(@__DIR__, "../common/fitness.jl"))
 include(joinpath(@__DIR__, "../common/individual.jl"))
 include(joinpath(@__DIR__, "../common/mutate.jl"))
 include(joinpath(@__DIR__, "../common/crossover.jl"))
+include(joinpath(@__DIR__, "../common/plot.jl"))
 
 file_path = joinpath(@__DIR__, "knapPI_12_500_1000_82.csv")
 df = CSV.read(file_path, DataFrame)
@@ -101,6 +102,9 @@ function generate_next_gen(parent_pool::Vector{Individual})
         child1 = Individual(child_genes[1])
         child2 = Individual(child_genes[2])
 
+        child1.fitness = fitness_score(child_genes[1])
+        child2.fitness = fitness_score(child_genes[2])
+
         append!(new_pop, (child1, child2))
     end
 
@@ -110,24 +114,6 @@ end
 # Helper functions
 get_weight(genes::BitVector) = sum(WEIGHTS[i] for (i, bit) in enumerate(genes) if bit)
 valid_solution(weight::Int64) = KNAPSACK_CAPACITY - weight >= 0
-
-
-# Plotting
-function plot_fitness(mean_scores, minimum_scores, maximum_scores; outfile="Project 1/knapsack/fitness_plot.pdf")
-    plot(mean_scores,
-         label="Mean Fitness",
-         xlabel="Generation",
-         ylabel="Fitness Score",
-         title="Genetic Algorithm Performance",
-         lw=2,
-         size=(800, 600))
-
-    plot!(maximum_scores, label="Max Fitness", color=:green)
-    plot!(minimum_scores, label="Min Fitness", color=:red)
-
-    savefig(outfile)
-    return nothing
-end
 
 
 """
@@ -153,9 +139,12 @@ function main()
 
     population::Vector{Individual} = initialize_population(POPULATION_SIZE, GENES_SIZE)
 
-    for i in 1:MAX_GENERATIONS
-        calculate_fitness(population)
+    # Calculates initial fitness scores
+    for ind in population
+        ind.fitness = fitness_score(ind.genes)
+    end
 
+    for i in 1:MAX_GENERATIONS
         # Filter out invalid genes
         valid_pop = [ind for ind in population if get_weight(ind.genes) <= KNAPSACK_CAPACITY]
 

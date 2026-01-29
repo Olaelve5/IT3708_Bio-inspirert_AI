@@ -1,4 +1,4 @@
-include(joinpath(@__DIR__, "individual.jl"))
+include(joinpath(@__DIR__, "../common/individual.jl"))
 
 function calculate_population_entropy(population::Vector{Individual})
     pop_size = length(population)

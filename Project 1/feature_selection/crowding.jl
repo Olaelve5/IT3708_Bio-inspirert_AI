@@ -1,4 +1,4 @@
-include(joinpath(@__DIR__, "individual.jl"))
+include(joinpath(@__DIR__, "../common/individual.jl"))
 
 
 hamming_distance(genes1::BitVector, genes2::BitVector) = count(xor.(genes1, genes2))

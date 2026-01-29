@@ -3,6 +3,10 @@ include(joinpath(@__DIR__, "individual.jl"))
 # Memorize fitness scores to prevent unnecessary calculations
 const fitness_memory = Dict{BitVector, Float64}()
 
+"""
+This function is only used in the feature selection problem.
+Knapsack has its own fitness function defined in knapsack.jl
+"""
 function fitness_score(genes::BitVector)
     # Only give a penalty if it doesn't take any features
     if sum(genes) == 0
@@ -23,13 +27,6 @@ function fitness_score(genes::BitVector)
     final_score = 1 / (rmse + 1e-6)
 
     return final_score
-end
-
-function calculate_fitness(population::Vector{Individual})
-    for ind in population
-        fitness = fitness_score(ind.genes)
-        ind.fitness = fitness
-    end
 end
 
 calculate_fitness_sum(population) = sum(ind.fitness for ind in population)
