@@ -3,15 +3,15 @@ using DataFrames
 using StableRNGs
 using MLJ
 
-include(joinpath(@__DIR__, "LinReg.jl"))
-include(joinpath(@__DIR__, "entropy.jl"))
-include(joinpath(@__DIR__, "crowding.jl"))
-include(joinpath(@__DIR__, "../common/plot.jl"))
-include(joinpath(@__DIR__, "../common/individual.jl"))
-include(joinpath(@__DIR__, "../common/fitness.jl"))
-include(joinpath(@__DIR__, "../common/survivor.jl"))
-include(joinpath(@__DIR__, "../common/mutate.jl"))
-include(joinpath(@__DIR__, "../common/crossover.jl"))
+include(joinpath(@__DIR__, "./helpers/LinReg.jl"))
+include(joinpath(@__DIR__, "./helpers/entropy.jl"))
+include(joinpath(@__DIR__, "./helpers/crowding.jl"))
+include(joinpath(@__DIR__, "./helpers/plot.jl"))
+include(joinpath(@__DIR__, "./helpers/individual.jl"))
+include(joinpath(@__DIR__, "./helpers/fitness.jl"))
+include(joinpath(@__DIR__, "./helpers/survivor_selection.jl"))
+include(joinpath(@__DIR__, "./helpers/mutate.jl"))
+include(joinpath(@__DIR__, "./helpers/crossover.jl"))
 
 
 function make_regression()
