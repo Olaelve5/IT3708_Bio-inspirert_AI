@@ -143,7 +143,7 @@ function main()
     maximum_scores = [] 
 
     global_best_ind = nothing
-    global_best_fitness = 0.0
+    global_best_fitness = 0
     global_best_generation = nothing
 
     population::Vector{Individual} = initialize_population(POPULATION_SIZE, GENES_SIZE)

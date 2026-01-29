@@ -1,3 +1,7 @@
+"""
+Crossover function that combines two parent BitVectors to produce offspring
+based on a crossover probability.
+"""
 function crossover(parent1_vec::BitVector, parent2_vec::BitVector)
     if rand() < CROSSOVER_PROB
         cut_point = rand(1:GENES_SIZE)

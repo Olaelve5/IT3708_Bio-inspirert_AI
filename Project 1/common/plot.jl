@@ -1,9 +1,17 @@
 using Plots
 
 """
-plot_fitness() is only used in the knapsack problem.
+plot_fitness() is only used in the knapsack problem. It plots the fitness scores
+over generations, highlighting the best score and generation if provided.
 """
-function plot_fitness(mean_scores, minimum_scores, maximum_scores, best_score=nothing, best_generation=nothing; outfile="Project 1/knapsack/fitness_plot.pdf")
+function plot_fitness(
+    mean_scores, 
+    minimum_scores, 
+    maximum_scores, 
+    best_score=nothing, 
+    best_generation=nothing; 
+    outfile="Project 1/knapsack/fitness_plot.pdf")
+    
     plot(mean_scores,
          label="Mean Fitness",
          xlabel="Generation",
