@@ -4,6 +4,11 @@ using Random
 using Statistics
 using Plots
 
+include(joinpath(@__DIR__, "../common/fitness.jl"))
+include(joinpath(@__DIR__, "../common/individual.jl"))
+include(joinpath(@__DIR__, "../common/mutate.jl"))
+include(joinpath(@__DIR__, "../common/crossover.jl"))
+
 file_path = joinpath(@__DIR__, "knapPI_12_500_1000_82.csv")
 df = CSV.read(file_path, DataFrame)
 
@@ -32,19 +37,6 @@ function penalty(weight::Int64)
     end
 end
 
-mutable struct Individual
-    genes::BitVector
-    fitness::Float64
-    selection_prob::Float64
-end
-
-Individual(size::Int) = Individual(Random.bitrand(size), 0.0, 0.0)
-Individual(genes::BitVector) = Individual(genes, 0.0, 0.0)
-
-function initialize_population(pop_size, genes_size)
-    return [Individual(genes_size) for _ in 1:pop_size]
-end
-
 
 function fitness_score(arr::BitVector)
     total_price::Int64 = 0
@@ -61,15 +53,6 @@ function fitness_score(arr::BitVector)
     
     return max(0.1, final_score)
 end
-
-function calculate_fitness(population::Vector{Individual})
-    for ind in population
-        fitness = fitness_score(ind.genes)
-        ind.fitness = fitness
-    end
-end
-
-calculate_fitness_sum(population) = sum(ind.fitness for ind in population)
 
 
 """
@@ -103,27 +86,6 @@ function parent_selection(population::Vector{Individual})
 end
 
 
-function mutate!(genes::BitVector)
-    for i in eachindex(genes)
-        if rand() < MUTATION_RATE
-            genes[i] = 1 - genes[i]
-        end
-    end
-end
-
-function crossover(parent1_vec::BitVector, parent2_vec::BitVector)
-    if rand() < CROSSOVER_PROB
-        cut_point = rand(1:GENES_SIZE)
-        child1 = vcat(parent1_vec[1:cut_point], parent2_vec[cut_point+1:end])
-        child2 = vcat(parent2_vec[1:cut_point], parent1_vec[cut_point+1:end])
-
-        return [child1, child2]
-    else
-        return (copy(parent1_vec), copy(parent2_vec))
-    end
-end
-
-
 function generate_next_gen(parent_pool::Vector{Individual})
     new_pop = []   
 
@@ -146,7 +108,6 @@ function generate_next_gen(parent_pool::Vector{Individual})
 end
 
 # Helper functions
-mean_fitness(pop) = mean(ind.fitness for ind in pop)
 get_weight(genes::BitVector) = sum(WEIGHTS[i] for (i, bit) in enumerate(genes) if bit)
 valid_solution(weight::Int64) = KNAPSACK_CAPACITY - weight >= 0
 

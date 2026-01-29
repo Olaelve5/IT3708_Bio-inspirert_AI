@@ -1,7 +1,5 @@
 include(joinpath(@__DIR__, "individual.jl"))
 
-
-
 # Memorize fitness scores to prevent unnecessary calculations
 const fitness_memory = Dict{BitVector, Float64}()
 
@@ -35,3 +33,4 @@ function calculate_fitness(population::Vector{Individual})
 end
 
 calculate_fitness_sum(population) = sum(ind.fitness for ind in population)
+mean_fitness(pop) = mean(ind.fitness for ind in pop)

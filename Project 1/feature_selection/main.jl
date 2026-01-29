@@ -4,12 +4,14 @@ using StableRNGs
 using MLJ
 
 include(joinpath(@__DIR__, "LinReg.jl"))
-include(joinpath(@__DIR__, "individual.jl"))
+include(joinpath(@__DIR__, "entropy.jl"))
 include(joinpath(@__DIR__, "crowding.jl"))
 include(joinpath(@__DIR__, "plot.jl"))
-include(joinpath(@__DIR__, "fitness.jl"))
-include(joinpath(@__DIR__, "entropy.jl"))
-include(joinpath(@__DIR__, "survivor.jl"))
+include(joinpath(@__DIR__, "../common/individual.jl"))
+include(joinpath(@__DIR__, "../common/fitness.jl"))
+include(joinpath(@__DIR__, "../common/survivor.jl"))
+include(joinpath(@__DIR__, "../common/mutate.jl"))
+include(joinpath(@__DIR__, "../common/crossover.jl"))
 
 
 function make_regression()
@@ -32,7 +34,8 @@ baseline_rmse = get_fitness(model, X, y; rng=myRNG)
 println("Baseline RMSE (All Features): $(round(baseline_rmse, digits=4))")
 
 """
-parent_selection() uses tournament selection.
+parent_selection() uses tournament selection as FPS with roulette wheel selection
+did not perform well.
 """
 function parent_selection(population::Vector{Individual})
     group_size = TOURNAMENT_GROUP_SIZE
@@ -48,26 +51,6 @@ function parent_selection(population::Vector{Individual})
     return parent_pool
 end
 
-
-function mutate!(genes::BitVector)
-    for i in eachindex(genes)
-        if rand() < MUTATION_RATE
-            genes[i] = 1 - genes[i]
-        end
-    end
-end
-
-function crossover(parent1_vec::BitVector, parent2_vec::BitVector)
-    if rand() < CROSSOVER_PROB
-        cut_point = rand(1:GENES_SIZE)
-        child1 = vcat(parent1_vec[1:cut_point], parent2_vec[cut_point+1:end])
-        child2 = vcat(parent2_vec[1:cut_point], parent1_vec[cut_point+1:end])
-
-        return [child1, child2]
-    else
-        return (copy(parent1_vec), copy(parent2_vec))
-    end
-end
 
 function generate_next_gen(population::Vector{Individual}, crowding_mode::Symbol=:none)
     new_pop = Vector{Individual}()
@@ -101,11 +84,6 @@ function generate_next_gen(population::Vector{Individual}, crowding_mode::Symbol
 
     return new_pop
 end
-
-# Helper functions
-mean_fitness(pop) = mean(ind.fitness for ind in pop)
-get_weight(genes::BitVector) = sum(WEIGHTS[i] for (i, bit) in enumerate(genes) if bit)
-valid_solution(weight::Int64) = KNAPSACK_CAPACITY - weight >= 0
 
 function run_experiment(mode::Symbol)
     mean_scores = Float64[]
