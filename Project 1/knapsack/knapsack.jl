@@ -125,14 +125,17 @@ function generate_next_gen(parent_pool::Vector{Individual})
     return new_population
 end
 
-# Helper functions
+
+"""
+Helper functions to get weight and check validity of a solution.
+"""
 get_weight(genes::BitVector) = sum(WEIGHTS[i] for (i, bit) in enumerate(genes) if bit)
 valid_solution(weight::Int64) = KNAPSACK_CAPACITY - weight >= 0
 
-
 """
 main() runs the full genetic algorithm loop.
-It filters out invalid solutions when reporting statistics and the best solution found.
+It filters out invalid solutions when tracking the best fitness scores, but
+uses the whole population when calculating mean and minimum fitness scores.
 """
 function main()
     mean_scores = []
@@ -151,31 +154,26 @@ function main()
     end
 
     for i in 1:MAX_GENERATIONS
-        # Filter out invalid genes
+        # Filter out invalid genes when looking for best fitness
         valid_pop = [ind for ind in population if get_weight(ind.genes) <= KNAPSACK_CAPACITY]
+        current_max = maximum(ind.fitness for ind in valid_pop)
 
-        if !isempty(valid_pop)
-            current_max = maximum(ind.fitness for ind in valid_pop)
-            current_min = minimum(ind.fitness for ind in valid_pop)
-            current_mean = mean(ind.fitness for ind in valid_pop)
+        # Calculate other stats using the whole population
+        current_min = minimum(ind.fitness for ind in population)
+        current_mean = mean(ind.fitness for ind in population)
 
-            if current_max > global_best_fitness
-                best_in_gen = valid_pop[argmax([ind.fitness for ind in valid_pop])]
-                global_best_fitness = current_max
-                global_best_ind = deepcopy(best_in_gen)
-                global_best_generation = i
-            end
-        else
-            current_max = 0.0
-            current_min = 0.0
-            current_mean = 0.0
+        if current_max > global_best_fitness
+            best_in_gen = valid_pop[argmax([ind.fitness for ind in valid_pop])]
+            global_best_fitness = current_max
+            global_best_ind = deepcopy(best_in_gen)
+            global_best_generation = i
         end
 
         push!(maximum_scores, current_max)
         push!(minimum_scores, current_min)
         push!(mean_scores, current_mean)
 
-        if i % 50 == 0
+        if i % 100 == 0
             println("Mean fitness for gen $i is: $(round(Int, current_mean))")
         end
 
@@ -208,9 +206,8 @@ const CROSSOVER_PROB::Float64 = 0.8
 const MUTATION_RATE::Float64 = 0.0001
 const MAX_GENERATIONS::Int64 = 10000
 
-# Prevents the main script from running when being imported in another file
-if abspath(PROGRAM_FILE) == @__FILE__
-    main()
-end
+
+main()
+
 
         
