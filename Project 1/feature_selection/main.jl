@@ -120,7 +120,6 @@ function main()
     mean_scores_crowding, min_scores_crowding, max_scores_crowding, entropy_history_crowding = run_experiment(:deterministic_crowding)
     mean_scores_elitism, min_scores_elitism, max_scores_elitism, entropy_history_elitism = run_experiment(:elitism)
 
-
     plot_rmse(mean_scores_SGA, min_scores_SGA, max_scores_SGA; outfile="Project 1/feature_selection/plots/fitness_plot_SGA.pdf")
     plot_rmse(mean_scores_crowding, min_scores_crowding, max_scores_crowding; outfile="Project 1/feature_selection/plots/fitness_plot_crowding.pdf")
     plot_rmse(mean_scores_elitism, min_scores_elitism, max_scores_elitism; outfile="Project 1/feature_selection/plots/fitness_plot_elitism.pdf")

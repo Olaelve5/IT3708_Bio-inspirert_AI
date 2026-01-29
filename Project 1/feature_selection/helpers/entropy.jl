@@ -2,6 +2,7 @@ include(joinpath(@__DIR__, "individual.jl"))
 
 """
 Calculates the population entropy based on the distribution of genes.
+It uses the entropy formula defined in the assignment.
 """
 function calculate_population_entropy(population::Vector{Individual})
     pop_size = length(population)
