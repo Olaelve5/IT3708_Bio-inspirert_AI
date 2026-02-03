@@ -17,7 +17,7 @@ const POPULATION_SIZE::Int64 = 100
 const GENES_SIZE::Int64 = 101
 const CROSSOVER_PROB::Float64 = 0.8
 const MUTATION_RATE::Float64 = 0.01
-const MAX_GENERATIONS::Int64 = 100
+const MAX_GENERATIONS::Int64 = 150
 const TOURNAMENT_GROUP_SIZE = 3
 
 # ============================================================================
@@ -45,8 +45,17 @@ println("Baseline RMSE (All Features): $(round(baseline_rmse, digits=4))")
 
 # ============================================================================
 # Run Genetic Algorithm
+
+# Can run in different modes:
+# :SGA - Standard Genetic Algorithm
+# :deterministic_crowding - Deterministic Crowding 
+# :probabilistic_crowding - Probabilistic Crowding
+# :elitism - Elitism (keeping top N individuals)
+# :global_elitism - Global Elitism (keeping the best indivuals from both parents and offspring)
 # ============================================================================
 function run_experiment(mode::Symbol)
+println("\n=== RUNNING EXPERIMENT: $mode ===")
+
     mean_scores = Float64[]
     max_scores = Float64[]
     min_scores = Float64[]
@@ -89,7 +98,9 @@ function run_experiment(mode::Symbol)
         elseif mode == :elitism
             parent_pool = parent_selection(population)
             offspring = generate_next_gen(parent_pool)
-            population = elitism(population, offspring, 5)
+
+            # Keeps the top 1% individuals from the old population
+            population = elitism(population, offspring, Int(0.01 * POPULATION_SIZE))
         elseif mode == :global_elitism
             parent_pool = parent_selection(population)
             offspring = generate_next_gen(parent_pool)
@@ -105,7 +116,7 @@ function run_experiment(mode::Symbol)
         
         num_features = sum(global_best_ind.genes)
         
-        println("Best RMSE Found:      $best_rmse")
+        println("Best RMSE Found:      $(round(best_rmse, digits=4))")
         println("Features Selected:    $num_features / 101")
         println("Fitness Score:        $(global_best_ind.fitness)")
     else
